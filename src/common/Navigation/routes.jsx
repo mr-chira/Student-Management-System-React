@@ -5,7 +5,6 @@ import ViewStudent from './../../pages/ManageStudent/ViewStudent';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
-
 const routes = [
     {
         name: 'Dashboard',
