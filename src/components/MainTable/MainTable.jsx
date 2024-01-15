@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { alpha, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, TableSortLabel, TablePagination, Toolbar, Typography, IconButton, Tooltip, Switch } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -34,7 +34,7 @@ function getComparator(order, orderBy) {
 }
 
 function EnhancedTableToolbar(props) {
-    const { numSelected, tableHeading } = props;
+    const { numSelected, tableHeading, onDelete } = props;
 
     return (
         <Toolbar
@@ -69,7 +69,7 @@ function EnhancedTableToolbar(props) {
 
             {numSelected > 0 ? (
                 <Tooltip title="Delete">
-                    <IconButton>
+                    <IconButton onClick={() => onDelete()}>
                         <DeleteIcon />
                     </IconButton>
                 </Tooltip>
@@ -87,14 +87,20 @@ function EnhancedTableToolbar(props) {
 EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
     tableHeading: PropTypes.string.isRequired,
+    onDelete: PropTypes.func.isRequired,
 };
 
-function MainTable({ columns, data, rowKey, tableHeading, withCheckbox = true, withPagination = true, rowsPerPageOptions = [5, 10, 25]}) {
+function MainTable({ columns, data, rowKey, tableHeading, onDelete, onSelect, selectedIds, withCheckbox = true, withPagination = true, rowsPerPageOptions = [5, 10, 25]}) {
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState(columns[0].id);
     const [selected, setSelected] = useState([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0]);
+
+    useEffect(() => {
+        const updatedSelected = data.filter(row => selectedIds.includes(row[rowKey])).map(row => row[rowKey]);
+        setSelected(updatedSelected);
+    }, [selectedIds, data, rowKey]);
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -114,21 +120,15 @@ function MainTable({ columns, data, rowKey, tableHeading, withCheckbox = true, w
     const handleClick = (event, id) => {
         const selectedIndex = selected.indexOf(id);
         let newSelected = [];
-
+    
         if (selectedIndex === -1) {
             newSelected = newSelected.concat(selected, id);
-        } else if (selectedIndex === 0) {
-            newSelected = newSelected.concat(selected.slice(1));
-        } else if (selectedIndex === selected.length - 1) {
-            newSelected = newSelected.concat(selected.slice(0, -1));
         } else {
-            newSelected = newSelected.concat(
-                selected.slice(0, selectedIndex),
-                selected.slice(selectedIndex + 1),
-            );
+            newSelected = newSelected.filter(selectedId => selectedId !== id);
         }
-
+    
         setSelected(newSelected);
+        onSelect(newSelected); // Pass the array of selected IDs
     };
 
     const handleChangePage = (event, newPage) => {
@@ -140,13 +140,13 @@ function MainTable({ columns, data, rowKey, tableHeading, withCheckbox = true, w
         setPage(0);
     };
 
-    const isSelected = (id) => selected.indexOf(id) !== -1;
+    const isSelected = (id) => selectedIds.includes(id);
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
 
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar numSelected={selected.length} tableHeading={tableHeading} />
+                <EnhancedTableToolbar numSelected={selected.length} tableHeading={tableHeading} onDelete={onDelete} onSelect={onSelect} />
                 <TableContainer>
                     <Table>
                         <TableHead>
@@ -248,7 +248,8 @@ MainTable.propTypes = {
     tableHeading: PropTypes.string.isRequired,
     withCheckbox: PropTypes.bool,
     withPagination: PropTypes.bool,
-    rowsPerPageOptions: PropTypes.array
+    rowsPerPageOptions: PropTypes.array,
+    onSelect: PropTypes.func.isRequired,
 };
 
 export default MainTable;

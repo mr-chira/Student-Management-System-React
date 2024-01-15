@@ -1,18 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import MainTable from '../../components/MainTable/MainTable';
 import LoadingGif from '../../assets/Infinity-1s-200px.gif'
+import instance from '../../services/AxiosLink';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function Dashboard() {
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [isDeleting, setIsDeleting] = useState(false);
 
+  const handleRowSelect = (selectedRows) => {
+    setSelectedIds(selectedRows);
+  };
+  
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('https://jsonplaceholder.typicode.com/posts');
+        const response = await instance.get('/posts');
         setData(response.data);
       } catch (error) {
         console.error('Error fetching data: ', error);
@@ -22,6 +29,20 @@ export default function Dashboard() {
 
     fetchData();
   }, []);
+
+  const handleDelete = async (selectedId) => {
+    setIsDeleting(true); // Start loading
+
+    try {
+        await instance.delete(`/posts/${selectedId}`);
+        setData(data.filter(item => item.id !== selectedId));
+        setSelectedIds([]);
+    } catch (error) {
+        console.error('Error deleting post: ', error);
+    } finally {
+        setIsDeleting(false); // Stop loading
+    }
+  };
 
   const columns = [
     { id: 'id', numeric: true, label: 'ID' },
@@ -43,19 +64,27 @@ export default function Dashboard() {
 
   return (
     <div>
-      {loading ? (
-        <div style={loadingStyle}><img src={LoadingGif} alt="Loading..." /></div>
-      ) : (
-        <MainTable
-        columns={columns}
-        data={data}
-        rowKey="id"
-        tableHeading="All Students"
-        withCheckbox={true}
-        withPagination={true}
-        rowsPerPageOptions={[5, 10, 25]}
-        />
-      )}
+        {isDeleting && (
+            <div style={loadingStyle}>
+                <CircularProgress />
+            </div>
+        )}
+        {loading ? (
+          <div style={loadingStyle}><img src={LoadingGif} alt="Loading..." /></div>
+        ) : (
+          <MainTable
+            columns={columns}
+            data={data}
+            rowKey="id"
+            tableHeading="All Students"
+            withCheckbox={true}
+            withPagination={true}
+            rowsPerPageOptions={[5, 10, 25]}
+            onSelect={handleRowSelect}
+            onDelete={() => handleDelete(selectedIds[0])}
+            selectedIds={selectedIds}
+          />
+        )}
     </div>
   )
 }
