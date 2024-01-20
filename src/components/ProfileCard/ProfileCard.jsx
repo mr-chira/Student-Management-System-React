@@ -7,7 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import EditIcon from '@mui/icons-material/Edit';
 import { Snackbar, Alert } from '@mui/material';
-import CardHeader from '../../components/CardHeader/index';
+import CardHeader from '../../components/CardHeader/CardHeader';
 
 export default function ProfileCard({ title, fields, onSubmit }) {
     const [formValues, setFormValues] = useState({});
@@ -38,9 +38,9 @@ export default function ProfileCard({ title, fields, onSubmit }) {
 
     const handleSnackbarClose = (event, reason) => {
       if (reason === 'clickaway') {
-          return; // Ignore if the user clicks away
+          return;
       }
-      setOpenSnackbar(false); // Close the Snackbar
+      setOpenSnackbar(false);
     };  
 
     return (
@@ -84,13 +84,7 @@ export default function ProfileCard({ title, fields, onSubmit }) {
                                 </Grid>
                             ))}
                             <Grid item xs={12} sm={12} md={12}>
-                                <Button
-                                    disableElevation
-                                    variant="contained"
-                                    endIcon={<EditIcon />}
-                                    sx={{ float: 'right' }}
-                                    type="submit"
-                                >
+                                <Button disableElevation variant="contained" endIcon={<EditIcon />} sx={{ float: 'right' }} type="submit">
                                     Update
                                 </Button>
                             </Grid>

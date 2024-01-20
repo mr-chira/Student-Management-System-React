@@ -8,6 +8,8 @@ import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import routes from '../common/Navigation/routes';
 import Navbar from '../common/Navbar/Navbar';
 import UpdateStudent from '../pages/ManageStudent/UpdateStudent';
+import Register from '../pages/Auth/Register';
+import Login from '../pages/Auth/Login';
 
 const drawerWidth = 240;
 
@@ -132,6 +134,8 @@ export default function App() {
             {getRoutes(routes)}
             <Route path='/' element={<Navigate to={'/dashboard'} />} />
             <Route path='/update/student' element={<UpdateStudent />} />
+            <Route path='/register' element={<Register />} />
+            <Route path='/login' element={<Login />} />
           </Routes>
         </div>
       </Box>

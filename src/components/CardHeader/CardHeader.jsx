@@ -19,16 +19,7 @@ const VARIANTS_CONFIG = {
 	},
 };
 
-/**
- *
- * @param {string} title
- * @param {string=} subtitle
- * @param {'small'|'medium'|'large'} size
- * @param {object=} sx
- * @returns
- */
-
-function CardHeader({ children, title, subtitle, size = 'medium', sx }) {
+export default function CardHeader({ children, title, subtitle, size = 'medium', sx }) {
 	return (
 		<Stack
 			mb={VARIANTS_CONFIG?.[size]?.headerMb}
@@ -42,7 +33,7 @@ function CardHeader({ children, title, subtitle, size = 'medium', sx }) {
 					variant={VARIANTS_CONFIG?.[size]?.titleVariant}
 					mb={VARIANTS_CONFIG?.[size]?.titleMb}
 					fontWeight="500"
-					textTransform="uppercase"
+					textTransform="cammelcase"
 				>
 					{title}
 				</Typography>
@@ -54,5 +45,3 @@ function CardHeader({ children, title, subtitle, size = 'medium', sx }) {
 		</Stack>
 	);
 }
-
-export default CardHeader;
