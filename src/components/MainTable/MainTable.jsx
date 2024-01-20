@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { alpha, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, TableSortLabel, TablePagination, Toolbar, Typography, IconButton, Tooltip, Switch } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 
@@ -34,7 +35,7 @@ function getComparator(order, orderBy) {
 }
 
 function EnhancedTableToolbar(props) {
-    const { numSelected, tableHeading, onDelete } = props;
+    const { numSelected, tableHeading, onDelete, onEdit } = props;
 
     return (
         <Toolbar
@@ -80,6 +81,14 @@ function EnhancedTableToolbar(props) {
                     </IconButton>
                 </Tooltip>
             )}
+
+            {numSelected > 0 ? (
+                <Tooltip title="Edit">
+                    <IconButton onClick={() => onEdit()}>
+                        <EditIcon />
+                    </IconButton>
+                </Tooltip>
+            ) : null }
         </Toolbar>
     );
 }
@@ -88,9 +97,10 @@ EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
     tableHeading: PropTypes.string.isRequired,
     onDelete: PropTypes.func.isRequired,
+    onEdit: PropTypes.func.isRequired,
 };
 
-function MainTable({ columns, data, rowKey, tableHeading, onDelete, onSelect, selectedIds, withCheckbox = true, withPagination = true, rowsPerPageOptions = [5, 10, 25]}) {
+function MainTable({ columns, data, rowKey, tableHeading, onDelete, onEdit, onSelect, selectedIds, withCheckbox = true, withPagination = true, rowsPerPageOptions = [5, 10, 25]}) {
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState(columns[0].id);
     const [selected, setSelected] = useState([]);
@@ -106,15 +116,6 @@ function MainTable({ columns, data, rowKey, tableHeading, onDelete, onSelect, se
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
-    };
-
-    const handleSelectAllClick = (event) => {
-        if (event.target.checked) {
-            const newSelecteds = data.map((n) => n[rowKey]);
-            setSelected(newSelecteds);
-            return;
-        }
-        setSelected([]);
     };
 
     const handleClick = (event, id) => {
@@ -146,20 +147,13 @@ function MainTable({ columns, data, rowKey, tableHeading, onDelete, onSelect, se
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar numSelected={selected.length} tableHeading={tableHeading} onDelete={onDelete} onSelect={onSelect} />
+                <EnhancedTableToolbar numSelected={selected.length} tableHeading={tableHeading} onDelete={onDelete} onSelect={onSelect} onEdit={onEdit} />
                 <TableContainer>
                     <Table>
                         <TableHead>
                             <TableRow>
                                 {withCheckbox && (
-                                    <TableCell padding="checkbox">
-                                        <Checkbox
-                                            indeterminate={selected.length > 0 && selected.length < data.length}
-                                            checked={data.length > 0 && selected.length === data.length}
-                                            onChange={handleSelectAllClick}
-                                            inputProps={{ 'aria-label': 'select all students' }}
-                                        />
-                                    </TableCell>
+                                    <TableCell padding="checkbox"></TableCell>
                                 )}
                                 {columns.map((headCell) => (
                                     <TableCell

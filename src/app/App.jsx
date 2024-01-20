@@ -7,6 +7,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import routes from '../common/Navigation/routes';
 import Navbar from '../common/Navbar/Navbar';
+import UpdateStudent from '../pages/ManageStudent/UpdateStudent';
 
 const drawerWidth = 240;
 
@@ -130,6 +131,7 @@ export default function App() {
           <Routes>
             {getRoutes(routes)}
             <Route path='/' element={<Navigate to={'/dashboard'} />} />
+            <Route path='/update/student' element={<UpdateStudent />} />
           </Routes>
         </div>
       </Box>

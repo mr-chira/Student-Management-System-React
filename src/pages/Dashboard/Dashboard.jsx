@@ -3,6 +3,7 @@ import MainTable from '../../components/MainTable/MainTable';
 import LoadingGif from '../../assets/Infinity-1s-200px.gif'
 import instance from '../../services/AxiosLink';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
 
@@ -10,6 +11,9 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState([]);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedRowData, setSelectedRowData] = useState(null);
+
+  const navigate = useNavigate();
 
   const handleRowSelect = (selectedRows) => {
     setSelectedIds(selectedRows);
@@ -43,6 +47,16 @@ export default function Dashboard() {
         setIsDeleting(false); // Stop loading
     }
   };
+
+  const handleEdit = () => {
+    if (selectedIds.length === 1) {
+        const rowData = data.find(row => row.id === selectedIds[0]);
+        // setSelectedRowData(rowData);
+        navigate('/update/student', { state: { rowData, columns } });
+    } else {
+      console.error('Error deleting post: ', error);
+    }
+  };  
 
   const columns = [
     { id: 'id', numeric: true, label: 'ID' },
@@ -83,6 +97,7 @@ export default function Dashboard() {
             onSelect={handleRowSelect}
             onDelete={() => handleDelete(selectedIds[0])}
             selectedIds={selectedIds}
+            onEdit={handleEdit}
           />
         )}
     </div>
